@@ -1,9 +1,6 @@
 const express = require('express');
 const productRoutes = require('./routes/productRoutes'); 
 const authRoutes = require('./routes/authRoutes');
-const departmentRoute = require('./routes/deparmentRoute/departmentRoute')
-const chatBotRoute = require('./routes/chatBotRoute/chatBotRoute')
-const whatsappRoutes = require('./routes/whatsappRoutes/whatsappRoutes');
 const bodyParser = require('body-parser');
 const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
 
@@ -33,9 +30,6 @@ connectDB();
 
 app.use('/api/auth', authRoutes);   
 app.use('/api/products', productRoutes);
-app.use('/api/department', departmentRoute),
-app.use('/api/createbots', chatBotRoute),
-app.use('/api/whatsapp', whatsappRoutes);
 app.use(bodyParser.json());
 app.use(errorHandler);
 
