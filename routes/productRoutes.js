@@ -4,11 +4,11 @@ const { validateProductInput, validate } = require('../middlewares/validateInput
 const authMiddleware = require('../middlewares/authMiddleware');
 const router = express.Router();
 
-router.post('/',authMiddleware, validateProductInput, validate, createProduct);
-router.get('/', authMiddleware,getAllProducts);
-router.get('/:id', authMiddleware,getProductById);
-router.put('/:id', authMiddleware,validateProductInput, validate, updateProduct);
-router.delete('/:id', authMiddleware,deleteProduct);
+router.post('/', validateProductInput, validate, createProduct);
+router.get('/',getAllProducts);
+router.get('/:id',getProductById);
+router.put('/:id',validateProductInput, validate, updateProduct);
+router.delete('/:id',deleteProduct);
 
 module.exports = router;
 

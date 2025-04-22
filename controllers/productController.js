@@ -2,14 +2,25 @@ const productService = require('../services/productService');
 const { errorResponse } = require('../utils/errorResponse');
 
 // Create a new product associated with a user
+// const createProduct = async (req, res, next) => {
+//     try {
+//         if (!req.user || !req.user.userId) {
+//             return next(errorResponse('User not authenticated', 401));
+//         }
+//         const productData = req.body;
+//         productData.user = req.user.userId;
+//         const newProduct = await productService.createProduct(productData,);
+//         res.status(201).json({ success: true, data: newProduct });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
 const createProduct = async (req, res, next) => {
     try {
-        if (!req.user || !req.user.userId) {
-            return next(errorResponse('User not authenticated', 401));
-        }
         const productData = req.body;
-        productData.user = req.user.userId;
-        const newProduct = await productService.createProduct(productData,);
+        const newProduct = await productService.createProduct(productData);
+
         res.status(201).json({ success: true, data: newProduct });
     } catch (error) {
         next(error);
