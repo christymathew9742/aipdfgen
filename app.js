@@ -53,6 +53,13 @@ const connectDB = require('./config/db');
 require('dotenv').config();
 const path = require('path');
 
+const fs = require('fs');
+
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const app = express();
 
 app.use(express.json({ limit: '50mb' }));
