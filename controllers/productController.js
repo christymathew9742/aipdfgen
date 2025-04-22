@@ -36,7 +36,6 @@ const getAllProducts = async (req, res, next) => {
         next(error);
     }
 };
-
 // Get a specific product by ID for the authenticated user
 const getProductById = async (req, res, next) => {
     try {
