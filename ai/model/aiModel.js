@@ -5,7 +5,7 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const generateAIResponse = async (prompt) => {
   const genAI = new GoogleGenerativeAI(process.env.API_GEM);
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   let retries = 0;
   let result;
@@ -14,7 +14,7 @@ const generateAIResponse = async (prompt) => {
       if(!prompt) return null;
 
       try {
-          result = await model.generateContent(prompt);//generateContentStream
+          result = await model.generateContent(prompt);
           if (result) {
               return result.response.text();
           }
@@ -29,7 +29,7 @@ const generateAIResponse = async (prompt) => {
       }
     return null;
   }
-  //throw new Error('AI model failed after maximum retries.');
+  throw new Error('AI model failed after maximum retries.');
 };
 
 module.exports = generateAIResponse;

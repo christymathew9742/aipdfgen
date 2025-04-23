@@ -3,6 +3,10 @@ const { errorResponse } = require('../utils/errorResponse');
 
 const saveFile = async (file) => {
     try {
+            if (!file || !file.path || !file.originalname) {
+            throw errorResponse('Invalid file data', 400);
+        }
+
         const uploadData = {
             originalName: file.originalname,
             mimeType: file.mimetype,
@@ -10,13 +14,19 @@ const saveFile = async (file) => {
             path: file.path,
             filename: file.filename,
         };
-        const saved = new Upload(uploadData);
-        return await saved.save();
-    } catch (error) {
-        throw errorResponse('Error saving file to DB', 500);
+
+        const newUpload = new Upload(uploadData);
+        return await newUpload.save();
+    } catch (err) {
+        console.error('File save error:', err);
+        throw errorResponse('Failed to save file to the database', 500);
     }
 };
 
 module.exports = {
     saveFile,
 };
+
+
+
+
