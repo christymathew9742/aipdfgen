@@ -7,7 +7,6 @@ const fs = require('fs');
 
 const router = express.Router();
 
-const uniqueId = uuidv4();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -19,6 +18,7 @@ const storage = multer.diskStorage({
         cb(null, uploadPath);
     },
     filename: (req, file, cb) => {
+        const uniqueId = uuidv4();
         const cleanName = file.originalname.replace(/\s+/g, '-');
         const fileName = `${uniqueId}-${cleanName}`;
         req.uploadedFileId = uniqueId;

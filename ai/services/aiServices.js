@@ -16,9 +16,23 @@ const updateConversationHistory = (uploadedFileId, prompt, aiResponse) => {
     userConversationHistories.set(uploadedFileId, session);
 };
 
+const clearUserSessionData = (uploadedFileId) => {
+    const userSession = userConversationHistories.get(uploadedFileId);
+    if (userSession) {
+        userSession.conversation = [];
+        userSession.userOptionsDisplayed = false;
+        userSession.userOptions = null;
+        userConversationHistories.set(uploadedFileId, userSession);
+    }
+};
+
 const createAIResponse = async (chatData) => {
     try {
         const { prompt, uploadedFileId, pdfText } = chatData;
+
+        if(pdfText.trim() === "") {
+            clearUserSessionData(uploadedFileId);
+        }
 
         let userSession = userConversationHistories.get(uploadedFileId);
         if (!userSession) {
