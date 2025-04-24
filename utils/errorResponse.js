@@ -1,10 +1,11 @@
-const errorResponse = (message, statusCode) => {
-    const error = new Error(message);
-    error.statusCode = statusCode;
-    return error;
-};
+const errorResponse = (message, statusCode) => ({
+    message,
+    statusCode,
+  });
   
 module.exports = { errorResponse };
+  
+
 
 
   
