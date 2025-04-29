@@ -1,30 +1,48 @@
 const app = require('./app');
-const WebSocket = require('ws');
+const http = require('http');
+const { Server } = require('socket.io');
+
+require('./scheduler/cleanup');
+
 const PORT = process.env.PORT || 5002;
-const server = app.listen(PORT, () => {
+
+// Create HTTP server manually
+const server = http.createServer(app);
+
+// Initialize Socket.IO server
+const io = new Server(server, {
+    cors: {
+        origin: [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://localhost:5001',
+            'https://mozilla.github.io',
+            'https://aipdfgenfe-christy.vercel.app/',
+        ],
+        methods: ['GET', 'POST'],
+    }
+});
+
+// Start server
+server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
-// Start the cleanup cron job
-//delet uploded file older after 10 days
-require('./scheduler/cleanup');
+// WebSocket connection
+io.on('connection', (socket) => {
+    console.log('A client connected:', socket.id);
 
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', (ws) => {
-    console.log('A new client connected');
-    
-    ws.on('message', (message) => {
-        console.log(`Received message: ${message}`);
-        wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
-        });
+    socket.on('join', (uploadedFileId) => {
+        console.log(`Client ${socket.id} joined room: ${uploadedFileId}`);
+        socket.join(uploadedFileId);
     });
 
-    ws.send('Welcome to the WebSocket server');
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+    });
 });
+
+app.set('io', io);
 
 process.on('SIGINT', () => {
     server.close(() => {
@@ -32,6 +50,9 @@ process.on('SIGINT', () => {
         process.exit(0);
     });
 });
+
+
+
 
 
 

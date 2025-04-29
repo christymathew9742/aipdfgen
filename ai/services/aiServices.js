@@ -30,6 +30,8 @@ const createAIResponse = async (chatData) => {
     try {
         const { prompt, uploadedFileId, pdfText } = chatData;
 
+        if(pdfText.trim() === undefined || pdfText.trim() === '') return;
+
         if(pdfText.trim() === "") {
             clearUserSessionData(uploadedFileId);
         }
