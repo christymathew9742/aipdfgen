@@ -16,7 +16,7 @@ const uploadSchema = new mongoose.Schema({
     path: {
         type: String,
         required: true,
-    },
+    }, 
     filename: {
         type: String,
         required: true,

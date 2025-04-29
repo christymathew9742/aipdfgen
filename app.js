@@ -6,7 +6,6 @@ const errorHandler = require('./middlewares/errorHandler');
 const connectDB = require('./config/db');
 require('dotenv').config();
 const path = require('path');
-
 const fs = require('fs');
 
 const uploadDir = path.join(__dirname, 'uploads');
@@ -20,21 +19,39 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
-
 // CORS configuration
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5001'];
+const allowedOrigins = [
+    'http://localhost:3000', 
+    'http://localhost:3001', 
+    'http://localhost:5001',
+    'https://mozilla.github.io',
+    "https://aipdfgenfe-christy.vercel.app/",
+];
+
+app.use('/uploads', (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    next();
+});
+
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+    } else {
+        console.warn(`Blocked by CORS: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+    }
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true,
+    methods: ['GET', 'HEAD', 'OPTIONS', 'POST'], 
+    allowedHeaders: ['Content-Type', 'Range'],
+    exposedHeaders: ['Content-Range', 'Content-Length', 'Accept-Ranges'],
+    maxAge: 86400, 
 }));
+
+app.options('*', cors()); 
 
 connectDB();
 
@@ -48,35 +65,3 @@ app.use(errorHandler);
 module.exports = app;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 

@@ -1,4 +1,3 @@
-const ChatBot = require('../models/chatBot');
 const { errorResponse } = require('../utils/errorResponse');
 const createAIResponse = require('../ai/services/aiServices');
 const sessionPdfData = require('../utils/sessionStore');
@@ -14,7 +13,7 @@ const createChatBot = async (chatData, res) => {
     if (!fileData) {
         return res.status(404).json(errorResponse('Uploaded file data not found in sectiomn store. Use latest uploadedFileId', 404));
     }
-
+   
     chatData.pdfText = fileData.extractedText;
     const aiResponse = await createAIResponse(chatData);
     return res.status(201).json({ success: true, data: aiResponse });

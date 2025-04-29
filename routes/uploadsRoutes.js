@@ -36,7 +36,6 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
-// Upload route
 router.post('/', upload.single('file'), uploadFile);
 
 module.exports = router;

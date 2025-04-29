@@ -24,7 +24,7 @@ curl -X POST http://localhost:5001/api/uploads \
 
 {
   "message": "File uploaded successfully",
-  "fileUrl": "http://localhost:5001/uploads/PDF-2025-04-23/0f4bc657-5136-4fbd-8e8d-dbc1ab4b8808-Abinash_Parida_Resume-(1).pdf",
+  "fileUrl": "http://localhost:5001/uploads/PDF-2025-04-23/0f4bc657-5136-4fbd-8e8d-dbc1ab4b8808-test-(1).pdf",
   "uploadedFileId": "0f4bc657-5136-4fbd-8e8d-dbc1ab4b8808"
 }
 🤖 2. Chatbot AI Interaction
