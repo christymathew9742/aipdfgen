@@ -1,5 +1,4 @@
 
-//fetch single value from DB
 const getOnlyOne = async (param, model) => {
     try {
         const query = { [param]: { $exists: true } };

@@ -25,7 +25,7 @@ const allowedOrigins = [
     'http://localhost:3001', 
     'http://localhost:5001',
     'https://mozilla.github.io',
-    "https://aipdfgenfe-christy.vercel.app/",
+    'https://aipdfgenfe-christy.vercel.app'
 ];
 
 app.use('/uploads', (req, res, next) => {
