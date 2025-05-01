@@ -20,13 +20,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // CORS configuration
-const allowedOrigins = [
-    'http://localhost:3000', 
-    'http://localhost:3001', 
-    'http://localhost:5001',
-    'https://mozilla.github.io',
-    'https://aipdfgenfe-christy.vercel.app'
-];
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
 app.use('/uploads', (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');

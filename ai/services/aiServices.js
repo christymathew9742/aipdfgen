@@ -16,38 +16,27 @@ const updateConversationHistory = (uploadedFileId, prompt, aiResponse) => {
     userConversationHistories.set(uploadedFileId, session);
 };
 
-const clearUserSessionData = (uploadedFileId) => {
-    const userSession = userConversationHistories.get(uploadedFileId);
-    if (userSession) {
-        userSession.conversation = [];
-        userSession.userOptionsDisplayed = false;
-        userSession.userOptions = null;
-        userConversationHistories.set(uploadedFileId, userSession);
-    }
-};
-
 const createAIResponse = async (chatData) => {
     try {
         const { prompt, uploadedFileId, pdfText } = chatData;
+  
+        if (!prompt || !pdfText?.trim()) return;
 
-        if(pdfText.trim() === undefined || pdfText.trim() === '') return;
+        let userSession = userConversationHistories.get(uploadedFileId) || {
+            conversation: [],
+            pdfText: null
+        };
 
-        if(pdfText.trim() === "") {
-            clearUserSessionData(uploadedFileId);
+        if (!userSession.pdfText) {
+            userSession.pdfText = pdfText;
         }
 
-        let userSession = userConversationHistories.get(uploadedFileId);
-        if (!userSession) {
-            userSession = { conversation: [] };
-            userConversationHistories.set(uploadedFileId, userSession);
-        }
-
-        const conversationHistory = userSession.conversation;
+        userConversationHistories.set(uploadedFileId, userSession);
 
         const generatedPrompt = await generateDynamicPrompt(
-            conversationHistory,
+            userSession.conversation,
             prompt,
-            pdfText
+            userSession.pdfText
         );
 
         const aiResponse = await generateAIResponse(generatedPrompt);
@@ -62,6 +51,7 @@ const createAIResponse = async (chatData) => {
 };
 
 module.exports = createAIResponse;
+
 
 
 

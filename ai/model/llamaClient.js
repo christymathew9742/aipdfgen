@@ -98,14 +98,14 @@ const uploadAndExtract = async (filePath, io, uploadedFileId) => {
         updateProgress(20, 'Starting Extraction Job');
 
         const status = await pollJobStatus(jobId, updateProgress);
-        updateProgress(40, 'Job Submitted');
+        updateProgress(30, 'Job Submitted');
 
         if (!status) {
             throw new Error(`Extraction job failed or incomplete: ${status}`);
         }
 
         const result = await getExtractionResult(jobId);
-        updateProgress(60, 'Processing Data');
+        updateProgress(50, 'Processing Data');
 
         return result;
     } catch (error) {
