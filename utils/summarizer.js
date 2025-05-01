@@ -1,4 +1,6 @@
 const generateAIResponse = require('../ai/model/aiModel');
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 
 function chunker(text, options = {}) {
     const {
@@ -42,7 +44,22 @@ function chunker(text, options = {}) {
     }
 }
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const summarizeChunk = async (chunk, promptType, retries = 3, retryDelay = 5000, onError) => {
+    let attempt = 0;
+    while (attempt < retries) {
+        try {
+            return await generateAIResponse(chunk, promptType);
+        } catch (error) {
+            attempt++;
+            if (attempt >= retries) {
+                onError(`Failed after ${attempt} attempts: ${error.message}`);
+                throw error;
+            }
+            console.log(`Retrying summarization (attempt ${attempt}) in ${retryDelay / 1000}s...`);
+            await delay(retryDelay);
+        }
+    }
+};
 
 const summarizer = async (
     chunks,
@@ -60,50 +77,31 @@ const summarizer = async (
     if (!Array.isArray(chunks) || chunks.length === 0) return '';
 
     const chunkSummaries = [];
-
     for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
 
-        let attempt = 0;
-        let success = false;
-
-        while (attempt < retries && !success) {
-            try {
-                const summary = summarize ? await generateAIResponse(chunk, promptType) : chunk;
-                chunkSummaries.push(summary);
-                onChunkProcessed(summary, i);
-                success = true;
-            } catch (err) {
-                attempt++;
-                const message = `Chunk ${i + 1} failed (attempt ${attempt}): ${err.message}`;
-                onError(message);
-
-                if (attempt < retries) {
-                    console.log(`Retrying chunk ${i + 1} in ${retryDelay / 1000}s...`);
-                    await delay(retryDelay);
-                } else {
-                    chunkSummaries.push('');
-                }
-            }
+        try {
+            const summary = summarize ? await summarizeChunk(chunk, promptType, retries, retryDelay, onError) : chunk;
+            chunkSummaries.push(summary);
+            onChunkProcessed(summary, i);
+        } catch (error) {
+            chunkSummaries.push(''); 
         }
 
-        if (i < chunks.length - 1) await delay(chunkDelay);
+        if (i < chunks.length - 1) await delay(chunkDelay); 
     }
 
     const combinedSummary = chunkSummaries.filter(Boolean).join('\n\n');
     
-
     if (finalSummarize) {
         try {
             const finalSummary = await generateAIResponse(combinedSummary, 'summarize');
-            const tokenCount =  Math.ceil(finalSummary.length / 4);
-            
+            const tokenCount = Math.ceil(finalSummary.length / 4);
+
             if (tokenCount > 512) {
                 onError(`Final summary exceeds token limit (${tokenCount} tokens). Returning combined summaries instead.`);
-                return `**ERROR MESSAGE**:Final summary exceeds token limit (${tokenCount} tokens). please Upload new small pdf`;
+                return `**ERROR MESSAGE**: Final summary exceeds token limit (${tokenCount} tokens). Please upload a smaller PDF.`;
             }
-        
-        
             return finalSummary;
         } catch (err) {
             onError('Final summarization failed: ' + err.message);
@@ -117,3 +115,4 @@ module.exports = {
     chunker,
     summarizer,
 };
+
