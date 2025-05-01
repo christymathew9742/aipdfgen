@@ -74,7 +74,7 @@ const generateAIResponse = async (content, type = 'prompt') => {
                 retries++;
             } else {
                 console.error('Failed to complete the request:', error.message);
-                return `**ERROR MESSAGE**:Failed to complete the request. please Upload new small pdf.`;
+                return `"I'm currently experiencing high demand and unable to process your request at the moment. Kindly try again in a little while. Thank you for your patience!`;
             }
         }
     }
