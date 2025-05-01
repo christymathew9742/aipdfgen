@@ -3,6 +3,7 @@ const fs = require('fs');
 const pdfParse = require('pdf-parse');
 const sessionPdfData = require('../utils/sessionStore');
 const { uploadAndExtract } = require('../ai/model/llamaClient');
+const{summarizer,chunker} = require('../utils/summarizer')
 
 const uploadFile = async (req, res, next) => {
     try {
@@ -30,25 +31,49 @@ const uploadFile = async (req, res, next) => {
         
             try {
                 const fileBuffer = fs.readFileSync(filePath);
-                
+
                 let extractedText = '';
                 const pdfData = await pdfParse(fileBuffer);
                 const isTextInsufficient = pdfData.text.trim().length < 20;
         
                 if (isTextInsufficient) {
                     const response = await uploadAndExtract(filePath, io, uploadedFileId);
-                    updateProgress(80, 'Fetching Extraction Results');
+                    updateProgress(60, 'Fetching Extraction Results');
                     extractedText = JSON.stringify(response?.data || '', null, 2);
                 } else {
                     extractedText = pdfData.text.trim();
                 }
+
                 await uploadService.saveFile(req.file);
-                sessionPdfData.set(uploadedFileId, {
-                    path: filePath,
-                    name: filename,
-                    extractedText,
-                });
-        
+
+                if (extractedText.length>0) {
+                    const chunks = chunker(extractedText, 
+                        {
+                            maxTokens: 4000,
+                            overlap: 50,
+                            sentenceSafe: true,
+                            onError: (err) => console.log('Chunking error:', err)
+                        }
+                    );
+                    updateProgress(70, 'Creating Chunk');
+                    
+                    const finalSummary = await summarizer(chunks, {
+                        summarize: true,
+                        finalSummarize: true,
+                        onChunkProcessed: (summary, index) => {
+                            console.log(`Chunk ${index + 1} summarized`);
+                        },
+                        onError: (err) => console.error(err)
+                    });
+                    updateProgress(90, 'Summarizing');
+
+                    sessionPdfData.set(uploadedFileId, {
+                        path: filePath,
+                        name: filename,
+                        finalSummary,
+                    });
+                }
+
                 updateProgress(100, 'Extraction Complited');
                 io.to(uploadedFileId).emit('extraction_complete', { uploadedFileId});
         

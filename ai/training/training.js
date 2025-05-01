@@ -27,7 +27,7 @@ const generateDynamicPrompt = async (
         ${currentDate} (${currentYear}) - ${currentTime}
 
         **Availability Legend**:  
-        Please respond clearly based on the document and conversationHistory and respond politely, naturally, focusing on the next necessary step. Follow the conversation.answer for all qustions maximum 200 words. if Document Content emply please inform to uploded "word based pdf not Image based pdf and low quality scanned pdf" and give clarity without fail.
+        Please respond clearly based on the document and conversationHistory and respond politely, naturally, focusing on the next necessary step. Follow the conversation.answer for all qustions maximum 200 words." give clarity for error messages.
     `;
 
     return prompt.trim();

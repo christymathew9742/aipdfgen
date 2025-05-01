@@ -11,3 +11,5 @@ const getOnlyOne = async (param, model) => {
 };
 
 module.exports = getOnlyOne;
+
+

@@ -14,7 +14,7 @@ const createChatBot = async (chatData, res) => {
         return res.status(404).json(errorResponse('Uploaded file data not found in sectiomn store. Use latest uploadedFileId', 404));
     }
    
-    chatData.pdfText = fileData.extractedText;
+    chatData.pdfText = fileData.finalSummary;
     const aiResponse = await createAIResponse(chatData);
     return res.status(201).json({ success: true, data: aiResponse });
 

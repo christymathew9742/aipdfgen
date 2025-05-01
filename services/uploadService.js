@@ -4,8 +4,8 @@ const { errorResponse } = require('../utils/errorResponse');
 const saveFile = async (file) => {
     try {
             if (!file || !file.path || !file.originalname) {
-            throw errorResponse('Invalid file data', 400);
-        }
+                throw errorResponse('Invalid file data', 400);
+            }
 
         const uploadData = {
             originalName: file.originalname,
