@@ -59,7 +59,12 @@ const summarizeChunk = async (chunk, promptType, retries = 3, retryDelay = 3000,
     }
 };
 
-const recursiveFinalSummarize = async (text, promptType, tokenLimit = 512, onError = console.error) => {
+const recursiveFinalSummarize = async (
+    text, 
+    promptType, 
+    tokenLimit = 1000, 
+    onError = console.error
+) => {
     const tokenCount = countTokens(text);
 
     if (tokenCount <= tokenLimit) {
