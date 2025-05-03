@@ -91,7 +91,6 @@ const uploadFile = async (req, res, next) => {
                     );
 
                     updateProgress(90, 'Summarizing');
-
                     sessionPdfData.set(uploadedFileId, {
                         path: newFilePath,
                         name: uniqueFileName,
