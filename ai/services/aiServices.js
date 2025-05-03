@@ -18,7 +18,7 @@ const updateConversationHistory = (uploadedFileId, prompt, aiResponse) => {
 
 const createAIResponse = async (chatData) => {
     try {
-        const { prompt, uploadedFileId, pdfText } = chatData;
+        const { prompt, uploadedFileId, pdfText, io } = chatData;
   
         if (!prompt || !pdfText?.trim()) return;
 
@@ -39,7 +39,7 @@ const createAIResponse = async (chatData) => {
             userSession.pdfText
         );
 
-        const aiResponse = await generateAIResponse(generatedPrompt);
+        const aiResponse = await generateAIResponse(generatedPrompt, 'prompt', io, uploadedFileId);
 
         updateConversationHistory(uploadedFileId, prompt, aiResponse);
 

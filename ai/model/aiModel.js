@@ -3,7 +3,7 @@ const { MAX_RETRIES, RETRY_DELAY_MS } = require('../../config/constants');
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const generateAIResponse = async (content, type = 'prompt') => {
+const generateAIResponse = async (content, type='prompt', io = undefined, uploadedFileId='') => {
     if (!content) return null;
 
     const genAI = new GoogleGenerativeAI(process.env.API_GEM);
@@ -11,10 +11,11 @@ const generateAIResponse = async (content, type = 'prompt') => {
 
     // Build prompt based on the type
     const buildPrompt = () => {
-        switch (type.toLowerCase()) {
+        switch (type) {
         case 'summarize':
             return `Summarize the following content:\n\n${content}\n\n *INPORTANT**:should not exceed 500 tokens of words.`;
         case 'prompt':
+            return content;
         default:
             return content;
         }
@@ -22,7 +23,6 @@ const generateAIResponse = async (content, type = 'prompt') => {
 
     let retries = 0;
     let result;
-    
     while (retries < MAX_RETRIES) {
         try {
             const prompt = buildPrompt();
@@ -37,8 +37,15 @@ const generateAIResponse = async (content, type = 'prompt') => {
                 await delay(RETRY_DELAY_MS);
                 retries++;
             } else {
-                console.error('Failed to complete the request:', error.message);
-                return `"I'm currently experiencing high demand and unable to process your request at the moment. Kindly try again in a little while. Thank you for your patience!`;
+                const Error = 'Our servers are currently busy. Please try again in a moment.';
+                console.error(Error, error.message);
+                    if (type === 'prompt' && io && uploadedFileId) {
+                        io.to(uploadedFileId).emit('internal_server_error', {
+                            uploadedFileId,
+                            Error,
+                        });
+                    }
+                return null;
             }
         }
     }

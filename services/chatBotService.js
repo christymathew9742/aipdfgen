@@ -1,7 +1,6 @@
 const { errorResponse } = require('../utils/errorResponse');
 const createAIResponse = require('../ai/services/aiServices');
 const sessionPdfData = require('../utils/sessionStore');
-const rateLimit = require('express-rate-limit');
 
 const fileLocks = new Map();
 
@@ -17,20 +16,10 @@ const withLock = async (key, fn) => {
     }
 };
 
-const createRateLimiter = () => {
-    return rateLimit({
-        windowMs: 60 * 1000,
-        max: 5, 
-        message: 'Too many requests, please try again later.',
-        standardHeaders: true,
-        legacyHeaders: false,
-    });
-};
-
-const createChatBot = async (chatData, res) => {
+const createChatBot = async (req, res) => {
     try {
-        const { prompt, uploadedFileId } = chatData;
-
+        const { prompt, uploadedFileId } = req.body;
+        const io = req.app.get('io');
         if (!prompt || !uploadedFileId) {
             return res.status(400).json(errorResponse('Prompt and uploadedFileId are required', 400));
         }
@@ -45,9 +34,9 @@ const createChatBot = async (chatData, res) => {
             return res.status(400).json(errorResponse('Summary not found. Try re-uploading the PDF.', 400));
         }
 
-        chatData.pdfText = fileData.finalSummary;
-
-        const aiResponse = await withLock(uploadedFileId, () => createAIResponse(chatData));
+        req.body.pdfText = fileData.finalSummary;
+        req.body.io = io;
+        const aiResponse = await withLock(uploadedFileId, () => createAIResponse(req.body));
 
         return res.status(201).json({ success: true, data: aiResponse });
 
@@ -59,7 +48,7 @@ const createChatBot = async (chatData, res) => {
 
 module.exports = {
     createChatBot,
-    createRateLimiter,
 };
+
 
 

@@ -4,7 +4,7 @@ const { errorResponse } = require('../utils/errorResponse');
 const createChatBot = async (req, res, next) => {
     try {
         const chatBotData = req.body;
-        await chatBotService.createChatBot(chatBotData,res);
+        await chatBotService.createChatBot(req,res);
     } catch (error) {
         next(errorResponse(error));
     }
